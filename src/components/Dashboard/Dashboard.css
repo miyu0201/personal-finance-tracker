@@ -1,9 +1,13 @@
 .dashboard {
-  padding: 5rem 2rem 2rem 2rem;
-  margin-top: 40rem;
+  padding: 2rem;
+  /* padding-top: calc(80px + 2rem); */
+  /* margin-top: 40em; */
   width: 100%;
   background: var(--bg-primary);
   min-height: 100vh;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .dashboard-header {
@@ -161,6 +165,10 @@
 @media (max-width: 768px) {
   .dashboard {
     padding: 1rem;
+    padding-top: calc(70px + 1rem);
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
   }
   
   .summary-cards {

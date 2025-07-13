@@ -60,7 +60,7 @@ code {
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin: 0;
+  /* margin-bottom: -40em; */
   padding: 0;
 }
 
@@ -72,7 +72,9 @@ code {
   position: sticky;
   top: 0;
   z-index: 100;
-  min-height: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
 }
 
 .nav-container {
@@ -179,7 +181,7 @@ code {
   background: var(--bg-primary);
   width: 100%;
   box-sizing: border-box;
-  margin-top: 0;
+  margin-top: 700px;
   padding-top: 0;
 }
 
@@ -251,6 +253,15 @@ textarea:focus {
     padding: 0 1rem;
   }
 
+  .nav-brand {
+    font-size: 1.1rem;
+  }
+
+  .nav-brand svg {
+    width: 24px;
+    height: 24px;
+  }
+
   .nav-menu {
     display: none;
   }
@@ -265,5 +276,38 @@ textarea:focus {
 
   .nav-actions {
     gap: 0.5rem;
+  }
+
+  .navigation {
+    height: 70px;
+  }
+
+  .main-content {
+    margin-top: 1400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 0 0.5rem;
+  }
+
+  .nav-brand {
+    font-size: 1rem;
+    gap: 0.5rem;
+  }
+
+  .nav-brand svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .navigation {
+    min-height: 60px;
+    padding: 0.5rem 0;
+  }
+
+  .main-content {
+    margin-top: 1100px;
   }
 }
