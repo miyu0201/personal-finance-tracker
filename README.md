@@ -7,6 +7,10 @@ A modern, responsive personal finance management application built with React 19
 ![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.8.2-764ABC?style=for-the-badge&logo=redux&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-4.0+-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
+View demo on https://my-finance-tracker2.netlify.app/
+
+<img width="1882" height="852" alt="finance-tracker" src="https://github.com/user-attachments/assets/7073ab70-f454-4342-95a5-64ef7e1bfbda" />
+
 ## ✨ Features
 
 ### 📊 Dashboard
