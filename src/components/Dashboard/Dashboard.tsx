@@ -1,10 +1,21 @@
-import React from 'react';
-import { useAppSelector } from '../../hooks/redux';
-import { ChartUtils } from '../../utils/charts';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js';
-import { Bar, Pie, Line } from 'react-chartjs-2';
-import { TrendingUp, TrendingDown, DollarSign, CreditCard } from 'lucide-react';
-import './Dashboard.css';
+import React from "react";
+import { useAppSelector } from "../../hooks/redux";
+import { ChartUtils } from "../../utils/charts";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  PointElement,
+  LineElement,
+} from "chart.js";
+import { Bar, Pie, Line } from "react-chartjs-2";
+import { TrendingUp, TrendingDown, DollarSign, CreditCard } from "lucide-react";
+import "./Dashboard.css";
 
 ChartJS.register(
   CategoryScale,
@@ -19,17 +30,19 @@ ChartJS.register(
 );
 
 const Dashboard: React.FC = () => {
-  const { transactions } = useAppSelector(state => state.transactions);
+  const { transactions } = useAppSelector((state) => state.transactions);
 
   const summary = ChartUtils.calculateFinancialSummary(transactions);
   const expensePieData = ChartUtils.generateExpensePieChart(transactions);
-  const monthlyComparisonData = ChartUtils.generateMonthlyComparisonChart(transactions);
+  const monthlyComparisonData =
+    ChartUtils.generateMonthlyComparisonChart(transactions);
   const spendingTrendData = ChartUtils.generateSpendingTrendChart(transactions);
+  const incomeTrendData = ChartUtils.generateIncomeTrendChart(transactions);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
@@ -38,7 +51,7 @@ const Dashboard: React.FC = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: "top" as const,
       },
       title: {
         display: false,
@@ -72,11 +85,17 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="card-content">
                 <h3>Total Expenses</h3>
-                <p className="amount">{formatCurrency(summary.totalExpenses)}</p>
+                <p className="amount">
+                  {formatCurrency(summary.totalExpenses)}
+                </p>
               </div>
             </div>
 
-            <div className={`summary-card net ${summary.netAmount >= 0 ? 'positive' : 'negative'}`}>
+            <div
+              className={`summary-card net ${
+                summary.netAmount >= 0 ? "positive" : "negative"
+              }`}
+            >
               <div className="card-icon">
                 <DollarSign size={24} />
               </div>
@@ -113,6 +132,12 @@ const Dashboard: React.FC = () => {
                 <Pie data={expensePieData} options={chartOptions} />
               </div>
             </div>
+            <div className="chart-container">
+              <h3>Income Trend (Last 6 Months)</h3>
+              <div className="chart-wrapper">
+                <Line data={incomeTrendData} options={chartOptions} />
+              </div>
+            </div>
 
             <div className="chart-container">
               <h3>Spending Trend (Last 30 Days)</h3>
@@ -131,10 +156,12 @@ const Dashboard: React.FC = () => {
             <div className="stat-item">
               <span className="stat-label">Average Transaction</span>
               <span className="stat-value">
-                {summary.transactionCount > 0 
-                  ? formatCurrency((summary.totalIncome + summary.totalExpenses) / summary.transactionCount)
-                  : formatCurrency(0)
-                }
+                {summary.transactionCount > 0
+                  ? formatCurrency(
+                      (summary.totalIncome + summary.totalExpenses) /
+                        summary.transactionCount
+                    )
+                  : formatCurrency(0)}
               </span>
             </div>
             <div className="stat-item">

@@ -9,7 +9,7 @@
   grid-area: content;
   display: grid;
   grid-template-rows: auto auto 1fr;
-  grid-template-areas: 
+  grid-template-areas:
     "header"
     "controls"
     "transactions";
@@ -27,7 +27,7 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0;
-  margin:0;
+  margin: 0;
 }
 
 .transaction-header h1 {
@@ -324,6 +324,7 @@
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);

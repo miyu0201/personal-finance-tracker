@@ -124,6 +124,52 @@ export class ChartUtils {
     };
   }
 
+  // Generate line chart for income trends
+  static generateIncomeTrendChart(transactions: Transaction[], months: number = 6): ChartData {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - months);
+    
+    const monthlyIncome = new Map<string, number>();
+    
+    // Initialize all months with 0
+    for (let i = 0; i < months; i++) {
+      const date = new Date(endDate);
+      date.setMonth(date.getMonth() - i);
+      const monthKey = format(startOfMonth(date), 'yyyy-MM');
+      monthlyIncome.set(monthKey, 0);
+    }
+
+    // Fill with actual income
+    transactions
+      .filter(t => t.type === 'income')
+      .forEach(transaction => {
+        const transactionDate = new Date(transaction.date);
+        if (transactionDate >= startDate && transactionDate <= endDate) {
+          const monthKey = format(startOfMonth(transactionDate), 'yyyy-MM');
+          if (monthlyIncome.has(monthKey)) {
+            const current = monthlyIncome.get(monthKey) || 0;
+            monthlyIncome.set(monthKey, current + transaction.amount);
+          }
+        }
+      });
+
+    const sortedMonths = Array.from(monthlyIncome.keys()).sort();
+    const labels = sortedMonths.map(month => format(new Date(month + '-01'), 'MMM yyyy'));
+    const data = sortedMonths.map(month => monthlyIncome.get(month) || 0);
+
+    return {
+      labels,
+      datasets: [{
+        label: 'Monthly Income',
+        data,
+        backgroundColor: ['rgba(16, 185, 129, 0.2)'],
+        borderColor: ['#10B981'],
+        borderWidth: 2
+      }]
+    };
+  }
+
   // Calculate financial summary
   static calculateFinancialSummary(transactions: Transaction[]): FinancialSummary {
     const totalIncome = transactions

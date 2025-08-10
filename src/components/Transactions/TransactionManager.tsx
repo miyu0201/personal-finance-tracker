@@ -1,37 +1,46 @@
-import React, { useState } from 'react';
-import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import { addTransaction, updateTransaction, deleteTransaction } from '../../store/transactionSlice';
-import { Plus, Edit, Trash2, Search, Download } from 'lucide-react';
-import { format } from 'date-fns';
-import { StorageService } from '../../utils/storage';
-import { Modal, ModalHeader, ModalBody } from 'reactstrap';
-import TransactionForm from './TransactionForm';
-import type { Transaction } from '../../types';
-import './TransactionManager.css';
+import React, { useState } from "react";
+import { useAppSelector, useAppDispatch } from "../../hooks/redux";
+import {
+  addTransaction,
+  updateTransaction,
+  deleteTransaction,
+} from "../../store/transactionSlice";
+import { Plus, Edit, Trash2, Search, Download } from "lucide-react";
+import { format } from "date-fns";
+import { StorageService } from "../../utils/storage";
+import { Modal, ModalHeader, ModalBody } from "reactstrap";
+import TransactionForm from "./TransactionForm";
+import type { Transaction } from "../../types";
+import "./TransactionManager.css";
 
 const TransactionManager: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { transactions } = useAppSelector(state => state.transactions);
-  const { defaultCategories } = useAppSelector(state => state.settings);
-  
+  const { transactions } = useAppSelector((state) => state.transactions);
+  const { defaultCategories } = useAppSelector((state) => state.settings);
+
   const [showForm, setShowForm] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
-  const handleSubmit = (transactionData: Omit<Transaction, 'id' | 'createdAt'>) => {
+  const handleSubmit = (
+    transactionData: Omit<Transaction, "id" | "createdAt">
+  ) => {
     if (editingTransaction) {
-      dispatch(updateTransaction({
-        ...transactionData,
-        id: editingTransaction.id,
-        createdAt: editingTransaction.createdAt
-      }));
+      dispatch(
+        updateTransaction({
+          ...transactionData,
+          id: editingTransaction.id,
+          createdAt: editingTransaction.createdAt,
+        })
+      );
     } else {
       dispatch(addTransaction(transactionData));
     }
@@ -45,7 +54,7 @@ const TransactionManager: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this transaction?')) {
+    if (window.confirm("Are you sure you want to delete this transaction?")) {
       dispatch(deleteTransaction(id));
     }
   };
@@ -56,17 +65,23 @@ const TransactionManager: React.FC = () => {
   };
 
   const handleDownload = () => {
-    StorageService.downloadCSV(transactions, `transactions-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    StorageService.downloadCSV(
+      transactions,
+      `transactions-${format(new Date(), "yyyy-MM-dd")}.csv`
+    );
   };
 
-  const filteredBySearch = transactions.filter(transaction =>
-    transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    transaction.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBySearch = transactions.filter(
+    (transaction) =>
+      transaction.description
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      transaction.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getCategoryColor = (categoryName: string) => {
-    const category = defaultCategories.find(cat => cat.name === categoryName);
-    return category?.color || '#6B7280';
+    const category = defaultCategories.find((cat) => cat.name === categoryName);
+    return category?.color || "#6B7280";
   };
 
   return (
@@ -89,14 +104,13 @@ const TransactionManager: React.FC = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="search-input"
                 />
-              
               </div>
             </div>
 
             <div className="actions-container">
               <button
                 onClick={() => {
-                  console.log('Add transaction button clicked');
+                  console.log("Add transaction button clicked");
                   setShowForm(true);
                 }}
                 className="btn btn-primary add-transaction-btn"
@@ -124,13 +138,21 @@ const TransactionManager: React.FC = () => {
               <div className="stat-item">
                 <span className="stat-label">Total Income:</span>
                 <span className="stat-value income">
-                  {formatCurrency(filteredBySearch.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0))}
+                  {formatCurrency(
+                    filteredBySearch
+                      .filter((t) => t.type === "income")
+                      .reduce((sum, t) => sum + t.amount, 0)
+                  )}
                 </span>
               </div>
               <div className="stat-item">
                 <span className="stat-label">Total Expenses:</span>
                 <span className="stat-value expense">
-                  {formatCurrency(filteredBySearch.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0))}
+                  {formatCurrency(
+                    filteredBySearch
+                      .filter((t) => t.type === "expense")
+                      .reduce((sum, t) => sum + t.amount, 0)
+                  )}
                 </span>
               </div>
             </div>
@@ -143,7 +165,11 @@ const TransactionManager: React.FC = () => {
               <div className="empty-state">
                 <Search size={64} className="empty-icon" />
                 <h3>No transactions found</h3>
-                <p>{searchTerm ? 'Try adjusting your search terms' : 'Start by adding your first transaction'}</p>
+                <p>
+                  {searchTerm
+                    ? "Try adjusting your search terms"
+                    : "Start by adding your first transaction"}
+                </p>
                 {!searchTerm && (
                   <button
                     className="btn btn-primary"
@@ -159,9 +185,13 @@ const TransactionManager: React.FC = () => {
                 <div key={transaction.id} className="transaction-card">
                   <div className="transaction-main">
                     <div className="transaction-icon">
-                      <div 
+                      <div
                         className="icon-circle"
-                        style={{ backgroundColor: getCategoryColor(transaction.category) }}
+                        style={{
+                          backgroundColor: getCategoryColor(
+                            transaction.category
+                          ),
+                        }}
                       >
                         <span className="icon-text">
                           {transaction.category.charAt(0).toUpperCase()}
@@ -175,14 +205,17 @@ const TransactionManager: React.FC = () => {
                       </h4>
                       <div className="transaction-meta">
                         <span className="category">{transaction.category}</span>
-                        <span className="date">{format(new Date(transaction.date), 'MMM dd, yyyy')}</span>
+                        <span className="date">
+                          {format(new Date(transaction.date), "MMM dd, yyyy")}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="transaction-amount">
                     <div className={`amount ${transaction.type}`}>
-                      {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                      {transaction.type === "income" ? "+" : "-"}
+                      {formatCurrency(transaction.amount)}
                     </div>
                     <div className="transaction-actions">
                       <button
@@ -207,8 +240,8 @@ const TransactionManager: React.FC = () => {
       </div>
 
       {/* Transaction Form Modal using ReactStrap */}
-      <Modal 
-        isOpen={showForm} 
+      <Modal
+        isOpen={showForm}
         toggle={handleCloseForm}
         size="lg"
         centered={true}
@@ -218,7 +251,7 @@ const TransactionManager: React.FC = () => {
         className="transaction-modal"
       >
         <ModalHeader toggle={handleCloseForm}>
-          {editingTransaction ? 'Edit Transaction' : 'Add New Transaction'}
+          {editingTransaction ? "Edit Transaction" : "Add New Transaction"}
         </ModalHeader>
         <ModalBody>
           <TransactionForm

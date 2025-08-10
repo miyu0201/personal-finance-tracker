@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Provider } from 'react-redux';
-import { store } from './store';
-import { useAppDispatch, useAppSelector } from './hooks/redux';
-import { loadTransactions } from './store/transactionSlice';
-import { updateSettings } from './store/settingsSlice';
-import { StorageService } from './utils/storage';
-import Dashboard from './components/Dashboard/Dashboard';
-import TransactionManager from './components/Transactions/TransactionManager';
-import { DollarSign, BarChart3, Moon, Sun, Menu, X } from 'lucide-react';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { Provider } from "react-redux";
+import { store } from "./store";
+import { useAppDispatch, useAppSelector } from "./hooks/redux";
+import { loadTransactions } from "./store/transactionSlice";
+import { updateSettings } from "./store/settingsSlice";
+import { StorageService } from "./utils/storage";
+import Dashboard from "./components/Dashboard/Dashboard";
+import TransactionManager from "./components/Transactions/TransactionManager";
+import { DollarSign, BarChart3, Moon, Sun, Menu, X } from "lucide-react";
+import "./App.css";
 
-type ViewType = 'dashboard' | 'transactions';
+type ViewType = "dashboard" | "transactions";
 
 const AppContent: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { theme } = useAppSelector(state => state.settings);
-  const [currentView, setCurrentView] = useState<ViewType>('dashboard');
+  const { theme } = useAppSelector((state) => state.settings);
+  const [currentView, setCurrentView] = useState<ViewType>("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Load data from localStorage on app start
@@ -33,8 +33,8 @@ const AppContent: React.FC = () => {
   }, [dispatch]);
 
   // Save data to localStorage when state changes
-  const { transactions } = useAppSelector(state => state.transactions);
-  const settings = useAppSelector(state => state.settings);
+  const { transactions } = useAppSelector((state) => state.transactions);
+  const settings = useAppSelector((state) => state.settings);
 
   useEffect(() => {
     StorageService.saveTransactions(transactions);
@@ -46,16 +46,16 @@ const AppContent: React.FC = () => {
 
   // Apply theme
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    dispatch(updateSettings({ theme: theme === 'light' ? 'dark' : 'light' }));
+    dispatch(updateSettings({ theme: theme === "light" ? "dark" : "light" }));
   };
 
   const renderCurrentView = () => {
     switch (currentView) {
-      case 'transactions':
+      case "transactions":
         return <TransactionManager />;
       default:
         return <Dashboard />;
@@ -63,8 +63,8 @@ const AppContent: React.FC = () => {
   };
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'transactions', label: 'Transactions', icon: DollarSign },
+    { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+    { id: "transactions", label: "Transactions", icon: DollarSign },
   ] as const;
 
   return (
@@ -81,13 +81,15 @@ const AppContent: React.FC = () => {
           </div>
 
           <div className="nav-actions">
-            {navItems.map(item => {
+            {navItems.map((item) => {
               const Icon = item.icon;
               return (
                 <a
                   key={item.id}
                   href="#"
-                  className={`nav-link ${currentView === item.id ? 'active' : ''}`}
+                  className={`nav-link ${
+                    currentView === item.id ? "active" : ""
+                  }`}
                   onClick={(e) => {
                     e.preventDefault();
                     setCurrentView(item.id as ViewType);
@@ -99,13 +101,13 @@ const AppContent: React.FC = () => {
                 </a>
               );
             })}
-            
+
             <button
               className="theme-toggle"
               onClick={toggleTheme}
-              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             >
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+              {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
             </button>
 
             <button
@@ -119,15 +121,17 @@ const AppContent: React.FC = () => {
         </div>
 
         {/* Mobile Navigation */}
-        <div className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className={`mobile-nav ${mobileMenuOpen ? "open" : ""}`}>
           <div className="nav-menu">
-            {navItems.map(item => {
+            {navItems.map((item) => {
               const Icon = item.icon;
               return (
                 <a
                   key={item.id}
                   href="#"
-                  className={`nav-link ${currentView === item.id ? 'active' : ''}`}
+                  className={`nav-link ${
+                    currentView === item.id ? "active" : ""
+                  }`}
                   onClick={(e) => {
                     e.preventDefault();
                     setCurrentView(item.id as ViewType);
@@ -143,9 +147,7 @@ const AppContent: React.FC = () => {
         </div>
       </nav>
 
-      <main className="main-content">
-        {renderCurrentView()}
-      </main>
+      <main className="main-content">{renderCurrentView()}</main>
     </div>
   );
 };
