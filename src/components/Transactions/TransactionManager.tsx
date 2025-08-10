@@ -4,6 +4,7 @@ import { addTransaction, updateTransaction, deleteTransaction } from '../../stor
 import { Plus, Edit, Trash2, Search, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { StorageService } from '../../utils/storage';
+import { Modal, ModalHeader, ModalBody } from 'reactstrap';
 import TransactionForm from './TransactionForm';
 import type { Transaction } from '../../types';
 import './TransactionManager.css';
@@ -70,104 +71,112 @@ const TransactionManager: React.FC = () => {
 
   return (
     <div className="transaction-manager">
-      {/* Header */}
-      <div className="dashboard-header">
-        <h1>Transactions</h1>
-        <p>Manage your income and expenses</p>
-      </div>
+      <div className="transaction-container">
+        <div className="transaction-header">
+          <h1>Transaction Management</h1>
+          <p>Track and manage your financial transactions</p>
+        </div>
 
-      {/* Search Bar with Actions */}
-      <div className="search-bar">
-        <div className="search-input">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Search transactions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="search-actions">
-          <button
-            className="action-btn primary"
-            onClick={() => setShowForm(true)}
-          >
-            <Plus size={20} />
-            Add Transaction
-          </button>
-          <button
-            className="action-btn secondary"
-            onClick={handleDownload}
-            disabled={transactions.length === 0}
-          >
-            <Download size={20} />
-            Export CSV
-          </button>
-        </div>
-      </div>
-
-      {/* Summary Bar */}
-      <div className="transaction-summary">
-        <div className="summary-item">
-          <span className="label">Total Transactions:</span>
-          <span className="value">{filteredBySearch.length}</span>
-        </div>
-        <div className="summary-item">
-          <span className="label">Total Income:</span>
-          <span className="value income">
-            {formatCurrency(filteredBySearch.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0))}
-          </span>
-        </div>
-        <div className="summary-item">
-          <span className="label">Total Expenses:</span>
-          <span className="value expense">
-            {formatCurrency(filteredBySearch.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0))}
-          </span>
-        </div>
-      </div>
-
-      {/* Transaction List */}
-      <div className="transaction-list">
-        {filteredBySearch.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">
-              <Search size={40} />
+        <section className="controls-section">
+          <div className="controls-grid">
+            <div className="search-container">
+              <div className="input-group">
+                <Search className="search-icon" size={15} />
+                <input
+                  type="text"
+                  placeholder="Search transactions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              
+              </div>
             </div>
-            <h3>No transactions found</h3>
-            <p>{searchTerm ? 'Try adjusting your search terms' : 'Start by adding your first transaction'}</p>
-            {!searchTerm && (
+
+            <div className="actions-container">
               <button
-                className="action-btn primary"
-                onClick={() => setShowForm(true)}
+                onClick={() => {
+                  console.log('Add transaction button clicked');
+                  setShowForm(true);
+                }}
+                className="btn btn-primary add-transaction-btn"
               >
-                <Plus size={20} />
+                <Plus size={18} />
                 Add Transaction
               </button>
-            )}
+              <button
+                onClick={handleDownload}
+                disabled={transactions.length === 0}
+                className="btn btn-outline export-btn"
+              >
+                <Download size={18} />
+                Export CSV
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className="transaction-grid">
-            {filteredBySearch.map((transaction) => (
-              <div key={transaction.id} className="transaction-card">
-                <div className="transaction-main">
-                  <div className="transaction-icon">
-                    <div 
-                      className="icon-circle"
-                      style={{ backgroundColor: getCategoryColor(transaction.category) }}
-                    >
-                      <span className="icon-text">
-                        {transaction.category.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
 
-                  <div className="transaction-details">
-                    <div className="transaction-description">
-                      {transaction.description}
+          <div className="summary-section">
+            <div className="summary-stats">
+              <div className="stat-item">
+                <span className="stat-label">Total Transactions:</span>
+                <span className="stat-value">{filteredBySearch.length}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Total Income:</span>
+                <span className="stat-value income">
+                  {formatCurrency(filteredBySearch.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0))}
+                </span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Total Expenses:</span>
+                <span className="stat-value expense">
+                  {formatCurrency(filteredBySearch.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0))}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="transactions-section">
+          <div className="transactions-grid">
+            {filteredBySearch.length === 0 ? (
+              <div className="empty-state">
+                <Search size={64} className="empty-icon" />
+                <h3>No transactions found</h3>
+                <p>{searchTerm ? 'Try adjusting your search terms' : 'Start by adding your first transaction'}</p>
+                {!searchTerm && (
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setShowForm(true)}
+                  >
+                    <Plus size={20} />
+                    Add Transaction
+                  </button>
+                )}
+              </div>
+            ) : (
+              filteredBySearch.map((transaction) => (
+                <div key={transaction.id} className="transaction-card">
+                  <div className="transaction-main">
+                    <div className="transaction-icon">
+                      <div 
+                        className="icon-circle"
+                        style={{ backgroundColor: getCategoryColor(transaction.category) }}
+                      >
+                        <span className="icon-text">
+                          {transaction.category.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
                     </div>
-                    <div className="transaction-meta">
-                      <span>{transaction.category}</span>
-                      <span>{format(new Date(transaction.date), 'MMM dd, yyyy')}</span>
+
+                    <div className="transaction-details">
+                      <h4 className="transaction-description">
+                        {transaction.description}
+                      </h4>
+                      <div className="transaction-meta">
+                        <span className="category">{transaction.category}</span>
+                        <span className="date">{format(new Date(transaction.date), 'MMM dd, yyyy')}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -175,44 +184,51 @@ const TransactionManager: React.FC = () => {
                     <div className={`amount ${transaction.type}`}>
                       {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                     </div>
+                    <div className="transaction-actions">
+                      <button
+                        className="btn btn-outline btn-sm"
+                        onClick={() => handleEdit(transaction)}
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(transaction.id)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-                <div className="transaction-actions">
-                  <button
-                    className="action-btn small secondary"
-                    onClick={() => handleEdit(transaction)}
-                  >
-                    <Edit size={16} />
-                    Edit
-                  </button>
-                  <button
-                    className="action-btn small danger"
-                    onClick={() => handleDelete(transaction.id)}
-                  >
-                    <Trash2 size={16} />
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
-        )}
+        </section>
       </div>
 
-      {/* Transaction Form Modal */}
-      {showForm && (
-        <div className="modal-overlay" onClick={handleCloseForm}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <TransactionForm
-              transaction={editingTransaction}
-              onSubmit={handleSubmit}
-              onCancel={handleCloseForm}
-              categories={defaultCategories}
-            />
-          </div>
-        </div>
-      )}
+      {/* Transaction Form Modal using ReactStrap */}
+      <Modal 
+        isOpen={showForm} 
+        toggle={handleCloseForm}
+        size="lg"
+        centered={true}
+        backdrop={true}
+        keyboard={true}
+        fade={true}
+        className="transaction-modal"
+      >
+        <ModalHeader toggle={handleCloseForm}>
+          {editingTransaction ? 'Edit Transaction' : 'Add New Transaction'}
+        </ModalHeader>
+        <ModalBody>
+          <TransactionForm
+            transaction={editingTransaction}
+            onSubmit={handleSubmit}
+            onCancel={handleCloseForm}
+            categories={defaultCategories}
+          />
+        </ModalBody>
+      </Modal>
     </div>
   );
 };

@@ -48,97 +48,101 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard">
-      <div className="dashboard-header">
-        <h1>Financial Dashboard</h1>
-        <p>Overview of your financial health</p>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="summary-cards">
-        <div className="summary-card income">
-          <div className="card-icon">
-            <TrendingUp size={24} />
-          </div>
-          <div className="card-content">
-            <h3>Total Income</h3>
-            <p className="amount">{formatCurrency(summary.totalIncome)}</p>
-          </div>
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <h1>Financial Dashboard</h1>
+          <p>Overview of your financial health</p>
         </div>
 
-        <div className="summary-card expense">
-          <div className="card-icon">
-            <TrendingDown size={24} />
-          </div>
-          <div className="card-content">
-            <h3>Total Expenses</h3>
-            <p className="amount">{formatCurrency(summary.totalExpenses)}</p>
-          </div>
-        </div>
+        <section className="summary-section">
+          <div className="summary-cards">
+            <div className="summary-card income">
+              <div className="card-icon">
+                <TrendingUp size={24} />
+              </div>
+              <div className="card-content">
+                <h3>Total Income</h3>
+                <p className="amount">{formatCurrency(summary.totalIncome)}</p>
+              </div>
+            </div>
 
-        <div className={`summary-card net ${summary.netAmount >= 0 ? 'positive' : 'negative'}`}>
-          <div className="card-icon">
-            <DollarSign size={24} />
-          </div>
-          <div className="card-content">
-            <h3>Net Amount</h3>
-            <p className="amount">{formatCurrency(summary.netAmount)}</p>
-          </div>
-        </div>
+            <div className="summary-card expense">
+              <div className="card-icon">
+                <TrendingDown size={24} />
+              </div>
+              <div className="card-content">
+                <h3>Total Expenses</h3>
+                <p className="amount">{formatCurrency(summary.totalExpenses)}</p>
+              </div>
+            </div>
 
-        <div className="summary-card transactions">
-          <div className="card-icon">
-            <CreditCard size={24} />
-          </div>
-          <div className="card-content">
-            <h3>Transactions</h3>
-            <p className="amount">{summary.transactionCount}</p>
-          </div>
-        </div>
-      </div>
+            <div className={`summary-card net ${summary.netAmount >= 0 ? 'positive' : 'negative'}`}>
+              <div className="card-icon">
+                <DollarSign size={24} />
+              </div>
+              <div className="card-content">
+                <h3>Net Amount</h3>
+                <p className="amount">{formatCurrency(summary.netAmount)}</p>
+              </div>
+            </div>
 
-      {/* Charts Grid */}
-      <div className="charts-grid">
-        <div className="chart-container">
-          <h3>Monthly Income vs Expenses</h3>
-          <div className="chart-wrapper">
-            <Bar data={monthlyComparisonData} options={chartOptions} />
+            <div className="summary-card transactions">
+              <div className="card-icon">
+                <CreditCard size={24} />
+              </div>
+              <div className="card-content">
+                <h3>Transactions</h3>
+                <p className="amount">{summary.transactionCount}</p>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="chart-container">
-          <h3>Expenses by Category</h3>
-          <div className="chart-wrapper">
-            <Pie data={expensePieData} options={chartOptions} />
+        <section className="charts-section">
+          <div className="charts-grid">
+            <div className="chart-container">
+              <h3>Monthly Income vs Expenses</h3>
+              <div className="chart-wrapper">
+                <Bar data={monthlyComparisonData} options={chartOptions} />
+              </div>
+            </div>
+
+            <div className="chart-container">
+              <h3>Expenses by Category</h3>
+              <div className="chart-wrapper">
+                <Pie data={expensePieData} options={chartOptions} />
+              </div>
+            </div>
+
+            <div className="chart-container">
+              <h3>Spending Trend (Last 30 Days)</h3>
+              <div className="chart-wrapper">
+                <Line data={spendingTrendData} options={chartOptions} />
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="chart-container">
-          <h3>Spending Trend (Last 30 Days)</h3>
-          <div className="chart-wrapper">
-            <Line data={spendingTrendData} options={chartOptions} />
+          {/* Quick Stats */}
+          <div className="quick-stats">
+            <div className="stat-item">
+              <span className="stat-label">Top Expense Category</span>
+              <span className="stat-value">{summary.topExpenseCategory}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Average Transaction</span>
+              <span className="stat-value">
+                {summary.transactionCount > 0 
+                  ? formatCurrency((summary.totalIncome + summary.totalExpenses) / summary.transactionCount)
+                  : formatCurrency(0)
+                }
+              </span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Total Transactions</span>
+              <span className="stat-value">{summary.transactionCount}</span>
+            </div>
           </div>
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="quick-stats">
-        <div className="stat-item">
-          <span className="stat-label">Top Expense Category</span>
-          <span className="stat-value">{summary.topExpenseCategory}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Average Transaction</span>
-          <span className="stat-value">
-            {summary.transactionCount > 0 
-              ? formatCurrency((summary.totalIncome + summary.totalExpenses) / summary.transactionCount)
-              : formatCurrency(0)
-            }
-          </span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Total Transactions</span>
-          <span className="stat-value">{summary.transactionCount}</span>
-        </div>
+        </section>
       </div>
     </div>
   );

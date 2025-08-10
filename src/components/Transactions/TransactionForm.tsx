@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import type { Transaction, Category } from '../../types';
 
 interface TransactionFormProps {
@@ -88,13 +88,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="transaction-form">
-      <div className="form-header">
-        <h2>{transaction ? 'Edit Transaction' : 'Add New Transaction'}</h2>
-        <button type="button" onClick={onCancel} className="close-btn">
-          <X size={20} />
-        </button>
-      </div>
-
       <div className="form-content">
         {/* Transaction Type */}
         <div className="form-group">
@@ -102,14 +95,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           <div className="type-selector">
             <button
               type="button"
-              className={`type-btn ${formData.type === 'income' ? 'active' : ''}`}
+              className={`type-option ${formData.type === 'income' ? 'active' : ''}`}
               onClick={() => handleTypeChange('income')}
             >
               Income
             </button>
             <button
               type="button"
-              className={`type-btn ${formData.type === 'expense' ? 'active' : ''}`}
+              className={`type-option ${formData.type === 'expense' ? 'active' : ''}`}
               onClick={() => handleTypeChange('expense')}
             >
               Expense
@@ -181,10 +174,10 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
       </div>
 
       <div className="form-actions">
-        <button type="button" onClick={onCancel} className="action-btn secondary">
+        <button type="button" onClick={onCancel} className="cancel-btn">
           Cancel
         </button>
-        <button type="submit" className="action-btn primary">
+        <button type="submit" className="submit-btn">
           <Save size={18} />
           {transaction ? 'Update' : 'Save'} Transaction
         </button>
