@@ -48,10 +48,11 @@
 .controls-section {
   grid-area: controls;
   display: grid;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
   grid-template-areas:
+    "summary"
     "search-actions"
-    "summary";
+    "filters";
   gap: 1.5rem;
 }
 
@@ -116,6 +117,140 @@
 .export-btn {
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+/* Filter Section */
+.filter-section {
+  grid-area: filters;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: auto auto auto 1fr;
+  gap: var(--spacing-lg);
+  align-items: end;
+  padding: var(--spacing-lg);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin: 0;
+}
+
+.filter-select {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: var(--transition-base);
+  min-width: 140px;
+  height: 40px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.filter-actions {
+  display: flex;
+  align-items: end;
+  justify-content: flex-end;
+  padding-bottom: 2px;
+}
+
+.clear-filters-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.875rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition-base);
+  height: 40px;
+}
+
+.clear-filters-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Sort Controls within Filter Section */
+.sort-buttons {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-base);
+  height: 40px;
+  min-width: 80px;
+}
+
+.sort-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--primary-300);
+}
+
+.sort-btn.active {
+  background: var(--primary-500);
+  color: white;
+  border-color: var(--primary-500);
+}
+
+.sort-btn.active:hover {
+  background: var(--primary-600);
+  border-color: var(--primary-600);
+}
+
+.sort-icon {
+  transition: var(--transition-base);
+  opacity: 0.7;
+}
+
+.sort-icon.active {
+  opacity: 1;
+}
+
+.sort-info {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+.sort-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
 }
 
 /* Summary Section */
@@ -350,8 +485,39 @@
     gap: var(--spacing-sm);
   }
 
+  .filter-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "type category"
+      "sort sort"
+      "actions actions";
+    gap: var(--spacing-sm);
+  }
+
+  .filter-group:nth-child(1) {
+    grid-area: type;
+  }
+
+  .filter-group:nth-child(2) {
+    grid-area: category;
+  }
+
+  .filter-group:nth-child(3) {
+    grid-area: sort;
+  }
+
+  .filter-actions {
+    grid-area: actions;
+    justify-content: center;
+  }
+
   .actions-container {
     justify-content: center;
+  }
+
+  .sort-info {
+    text-align: center;
   }
 
   .summary-stats {
@@ -408,6 +574,42 @@
 
   .actions-container .btn {
     width: 100%;
+  }
+
+  .filter-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "type"
+      "category"
+      "sort"
+      "actions";
+    gap: var(--spacing-sm);
+  }
+
+  .filter-group:nth-child(1) {
+    grid-area: type;
+  }
+
+  .filter-group:nth-child(2) {
+    grid-area: category;
+  }
+
+  .filter-group:nth-child(3) {
+    grid-area: sort;
+  }
+
+  .filter-actions {
+    grid-area: actions;
+    justify-content: center;
+  }
+
+  .filter-select {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .sort-info {
+    text-align: center;
   }
 }
 

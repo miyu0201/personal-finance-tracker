@@ -88,10 +88,28 @@ const initialTransactions: Transaction[] = [
 
 interface TransactionState {
   transactions: Transaction[];
+  filters: {
+    type: 'all' | 'income' | 'expense';
+    category: string;
+    searchTerm: string;
+  };
+  sorting: {
+    field: 'date' | 'amount';
+    order: 'asc' | 'desc';
+  };
 }
 
 const initialState: TransactionState = {
   transactions: initialTransactions,
+  filters: {
+    type: 'all',
+    category: 'all',
+    searchTerm: ''
+  },
+  sorting: {
+    field: 'date',
+    order: 'desc'
+  },
 };
 
 const transactionSlice = createSlice({
@@ -129,6 +147,40 @@ const transactionSlice = createSlice({
     loadTransactions: (state, action: PayloadAction<Transaction[]>) => {
       state.transactions = action.payload;
     },
+
+    setTypeFilter: (state, action: PayloadAction<'all' | 'income' | 'expense'>) => {
+      state.filters.type = action.payload;
+    },
+
+    setCategoryFilter: (state, action: PayloadAction<string>) => {
+      state.filters.category = action.payload;
+    },
+
+    setSearchTerm: (state, action: PayloadAction<string>) => {
+      state.filters.searchTerm = action.payload;
+    },
+
+    clearFilters: (state) => {
+      state.filters = {
+        type: 'all',
+        category: 'all',
+        searchTerm: ''
+      };
+    },
+
+    setSortField: (state, action: PayloadAction<'date' | 'amount'>) => {
+      // If clicking the same field, toggle order; otherwise set new field with desc order
+      if (state.sorting.field === action.payload) {
+        state.sorting.order = state.sorting.order === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sorting.field = action.payload;
+        state.sorting.order = 'desc';
+      }
+    },
+
+    setSortOrder: (state, action: PayloadAction<'asc' | 'desc'>) => {
+      state.sorting.order = action.payload;
+    },
   },
 });
 
@@ -137,6 +189,12 @@ export const {
   updateTransaction,
   deleteTransaction,
   loadTransactions,
+  setTypeFilter,
+  setCategoryFilter,
+  setSearchTerm,
+  clearFilters,
+  setSortField,
+  setSortOrder,
 } = transactionSlice.actions;
 
 export default transactionSlice.reducer;

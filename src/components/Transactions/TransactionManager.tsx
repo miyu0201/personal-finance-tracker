@@ -4,8 +4,23 @@ import {
   addTransaction,
   updateTransaction,
   deleteTransaction,
+  setTypeFilter,
+  setCategoryFilter,
+  setSearchTerm,
+  clearFilters,
+  setSortField,
 } from "../../store/transactionSlice";
-import { Plus, Edit, Trash2, Search, Download } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  Download,
+  X,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 import { format } from "date-fns";
 import { StorageService } from "../../utils/storage";
 import { Modal, ModalHeader, ModalBody } from "reactstrap";
@@ -15,13 +30,14 @@ import "./TransactionManager.css";
 
 const TransactionManager: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { transactions } = useAppSelector((state) => state.transactions);
+  const { transactions, filters, sorting } = useAppSelector(
+    (state) => state.transactions
+  );
   const { defaultCategories } = useAppSelector((state) => state.settings);
 
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -71,13 +87,106 @@ const TransactionManager: React.FC = () => {
     );
   };
 
-  const filteredBySearch = transactions.filter(
-    (transaction) =>
-      transaction.description
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      transaction.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter and sort transactions based on current filters and sorting
+  const getFilteredAndSortedTransactions = () => {
+    let filtered = transactions.filter((transaction) => {
+      // Type filter
+      if (filters.type !== "all" && transaction.type !== filters.type) {
+        return false;
+      }
+
+      // Category filter
+      if (
+        filters.category !== "all" &&
+        transaction.category !== filters.category
+      ) {
+        return false;
+      }
+
+      // Search term filter
+      if (
+        filters.searchTerm &&
+        !transaction.description
+          .toLowerCase()
+          .includes(filters.searchTerm.toLowerCase()) &&
+        !transaction.category
+          .toLowerCase()
+          .includes(filters.searchTerm.toLowerCase())
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue: number | Date;
+      let bValue: number | Date;
+
+      if (sorting.field === "date") {
+        aValue = new Date(a.date);
+        bValue = new Date(b.date);
+      } else {
+        aValue = a.amount;
+        bValue = b.amount;
+      }
+
+      if (sorting.order === "asc") {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+
+    return filtered;
+  };
+
+  const filteredTransactions = getFilteredAndSortedTransactions();
+
+  // Get unique categories for filter dropdown
+  const getUniqueCategories = () => {
+    const categories = new Set(transactions.map((t) => t.category));
+    return Array.from(categories).sort();
+  };
+
+  const uniqueCategories = getUniqueCategories();
+
+  const handleSearchChange = (value: string) => {
+    dispatch(setSearchTerm(value));
+  };
+
+  const handleTypeFilterChange = (type: "all" | "income" | "expense") => {
+    dispatch(setTypeFilter(type));
+  };
+
+  const handleCategoryFilterChange = (category: string) => {
+    dispatch(setCategoryFilter(category));
+  };
+
+  const handleClearFilters = () => {
+    dispatch(clearFilters());
+  };
+
+  const handleSortFieldChange = (field: "date" | "amount") => {
+    dispatch(setSortField(field));
+  };
+
+  const getSortIcon = (field: "date" | "amount") => {
+    if (sorting.field !== field) {
+      return <ArrowUpDown size={16} className="sort-icon" />;
+    }
+    return sorting.order === "asc" ? (
+      <ArrowUp size={16} className="sort-icon active" />
+    ) : (
+      <ArrowDown size={16} className="sort-icon active" />
+    );
+  };
+
+  const hasActiveFilters =
+    filters.type !== "all" ||
+    filters.category !== "all" ||
+    filters.searchTerm !== "";
 
   const getCategoryColor = (categoryName: string) => {
     const category = defaultCategories.find((cat) => cat.name === categoryName);
@@ -93,6 +202,43 @@ const TransactionManager: React.FC = () => {
         </div>
 
         <section className="controls-section">
+          <div className="summary-section">
+            <div className="summary-stats">
+              <div className="stat-item">
+                <span className="stat-label">Total Transactions:</span>
+                <span className="stat-value">
+                  {filteredTransactions.length}
+                </span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Total Income:</span>
+                <span className="stat-value income">
+                  {formatCurrency(
+                    filteredTransactions
+                      .filter((t: Transaction) => t.type === "income")
+                      .reduce(
+                        (sum: number, t: Transaction) => sum + t.amount,
+                        0
+                      )
+                  )}
+                </span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Total Expenses:</span>
+                <span className="stat-value expense">
+                  {formatCurrency(
+                    filteredTransactions
+                      .filter((t: Transaction) => t.type === "expense")
+                      .reduce(
+                        (sum: number, t: Transaction) => sum + t.amount,
+                        0
+                      )
+                  )}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div className="controls-grid">
             <div className="search-container">
               <div className="input-group">
@@ -100,8 +246,8 @@ const TransactionManager: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Search transactions..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={filters.searchTerm}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="search-input"
                 />
               </div>
@@ -129,48 +275,108 @@ const TransactionManager: React.FC = () => {
             </div>
           </div>
 
-          <div className="summary-section">
-            <div className="summary-stats">
-              <div className="stat-item">
-                <span className="stat-label">Total Transactions:</span>
-                <span className="stat-value">{filteredBySearch.length}</span>
+          {/* Filter Section */}
+          <div className="filter-section">
+            <div className="filter-grid">
+              <div className="filter-group">
+                <label className="filter-label">Type:</label>
+                <select
+                  value={filters.type}
+                  onChange={(e) =>
+                    handleTypeFilterChange(
+                      e.target.value as "all" | "income" | "expense"
+                    )
+                  }
+                  className="filter-select"
+                >
+                  <option value="all">All Types</option>
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
               </div>
-              <div className="stat-item">
-                <span className="stat-label">Total Income:</span>
-                <span className="stat-value income">
-                  {formatCurrency(
-                    filteredBySearch
-                      .filter((t) => t.type === "income")
-                      .reduce((sum, t) => sum + t.amount, 0)
-                  )}
-                </span>
+
+              <div className="filter-group">
+                <label className="filter-label">Category:</label>
+                <select
+                  value={filters.category}
+                  onChange={(e) => handleCategoryFilterChange(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="all">All Categories</option>
+                  {uniqueCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="stat-item">
-                <span className="stat-label">Total Expenses:</span>
-                <span className="stat-value expense">
-                  {formatCurrency(
-                    filteredBySearch
-                      .filter((t) => t.type === "expense")
-                      .reduce((sum, t) => sum + t.amount, 0)
-                  )}
-                </span>
+
+              <div className="filter-group">
+                <label className="filter-label">Sort by:</label>
+                <div className="sort-buttons">
+                  <button
+                    onClick={() => handleSortFieldChange("date")}
+                    className={`sort-btn ${
+                      sorting.field === "date" ? "active" : ""
+                    }`}
+                  >
+                    Date {getSortIcon("date")}
+                  </button>
+                  <button
+                    onClick={() => handleSortFieldChange("amount")}
+                    className={`sort-btn ${
+                      sorting.field === "amount" ? "active" : ""
+                    }`}
+                  >
+                    Amount {getSortIcon("amount")}
+                  </button>
+                </div>
               </div>
+
+              {hasActiveFilters && (
+                <div className="filter-actions">
+                  <button
+                    onClick={handleClearFilters}
+                    className="btn btn-ghost clear-filters-btn"
+                  >
+                    <X size={16} />
+                    Clear Filters
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Sort Info */}
+            <div className="sort-info">
+              <span className="sort-text">
+                Showing {filteredTransactions.length} transaction
+                {filteredTransactions.length !== 1 ? "s" : ""}
+                {sorting.field === "date"
+                  ? ` sorted by date (${
+                      sorting.order === "desc" ? "newest first" : "oldest first"
+                    })`
+                  : ` sorted by amount (${
+                      sorting.order === "desc"
+                        ? "highest first"
+                        : "lowest first"
+                    })`}
+              </span>
             </div>
           </div>
         </section>
 
         <section className="transactions-section">
           <div className="transactions-grid">
-            {filteredBySearch.length === 0 ? (
+            {filteredTransactions.length === 0 ? (
               <div className="empty-state">
                 <Search size={64} className="empty-icon" />
                 <h3>No transactions found</h3>
                 <p>
-                  {searchTerm
-                    ? "Try adjusting your search terms"
+                  {filters.searchTerm || hasActiveFilters
+                    ? "Try adjusting your search terms or filters"
                     : "Start by adding your first transaction"}
                 </p>
-                {!searchTerm && (
+                {!filters.searchTerm && !hasActiveFilters && (
                   <button
                     className="btn btn-primary"
                     onClick={() => setShowForm(true)}
@@ -181,7 +387,7 @@ const TransactionManager: React.FC = () => {
                 )}
               </div>
             ) : (
-              filteredBySearch.map((transaction) => (
+              filteredTransactions.map((transaction: Transaction) => (
                 <div key={transaction.id} className="transaction-card">
                   <div className="transaction-main">
                     <div className="transaction-icon">
